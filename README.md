@@ -5,6 +5,7 @@
   Each challenge has progressively more difficult "bonus challenges" to test your programming knowledge.
 
 ## Getting Started with Basic Git Commands
+ Open Windows Powershell or the terminal
   `git clone https://github.com/quaxlyqueen/club-challenges`                                   ~ Makes a local copy of the repository on your machine.  
   `git pull`                                                                                   ~ Retrieves the most recent changes from the "remote" repository (GitHub).  
   `git branch NAME`                                                                            ~ Creates a new branch called NAME. Substitute this with the changes you're making.  
