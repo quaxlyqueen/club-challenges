@@ -12,14 +12,27 @@ public class Week2 {
      * HINT: Solution 1 uses 1000 iterations in 1 loop. 
      */
     public static int problem1() {
-        return -1; // TODO
+        int sum = 0;
+
+        for(int i = 0; i < 1000; i++) {
+            if(i % 5 == 0 || i % 3 == 0) sum += i;
+        }
+
+        return sum;
     }
 
     /**
      * BONUS CHALLENGE: Find a more efficient solution for problem 1 (ie. a solution that uses less than 1000 iterations).
      */
     public static int problem2() {
-        return -1; // TODO
+        int sum = 0;
+        for(int i = 5; i < 1000; i+=5)
+            sum += i;
+
+        for(int i = 3; i < 1000; i+=3) 
+            if(i % 5 != 0) sum += i;
+
+        return sum;
     }
 
     /**
