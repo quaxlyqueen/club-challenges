@@ -1,115 +1,180 @@
+package week9;
+
 import java.awt.event.*;
 
 import java.util.ArrayList;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class Week9 {
-    private static ArrayList<Task> tasks;
-    private static String filepath;
-    private static Week9Gui gui;
+	private static ArrayList<Task> tasks;
+	private static String filepath;
+	private static Week9Gui gui;
 
-    // NOTE: For sorts, the Task class needs something implemented.
-    private static void sortByTitle() {
-        System.out.println("Sort By Title clicked!");
-        // TODO
-        gui.update(tasks);
-    }
+	// NOTE: For sorts, the Task class needs something implemented.
+	private static void sortByTitle() {
+		System.out.println("Sort By Title clicked!");
+		// TODO
+		gui.update(tasks);
+	}
 
-    // NOTE: For sorts, the Task class needs something implemented.
-    private static void sortByDueDate() {
-        System.out.println("Sort By Due Date clicked!");
-        // TODO
-        gui.update(tasks);
-    }
+	// NOTE: For sorts, the Task class needs something implemented.
+	private static void sortByDueDate() {
+		System.out.println("Sort By Due Date clicked!");
+		// TODO
+		gui.update(tasks);
+	}
 
-    // NOTE: For sorts, the Task class needs something implemented.
-    private static void filterByComplete() {
-        System.out.println("Filter By Complete clicked!");
-        // TODO
-        gui.update(tasks);
-    }
+	// NOTE: For sorts, the Task class needs something implemented.
+	private static void filterByComplete() {
+		System.out.println("Filter By Complete clicked!");
+		// TODO
+		gui.update(tasks);
+	}
 
-    private void parse(File f) {
-        // TODO: Need to open the file and get each line.
-        // TODO: Parse the format ("TITLE, DESCRIPTION, DUE DATE, COMPLETED"), 
-        // TODO: Create a new Task object and add it to the ArrayList.
-    }
+	private void parse(File f) {
+		try (BufferedReader myReader = new BufferedReader(new FileReader(f))) {
+			String line;
+			String[] data;
 
-    // Writes each task to the file after a change.
-    private static void saveTasks() {
-        System.out.println("writing tasks to " + filepath);
-        // TODO: Write each Task stored in the ArrayList to the file.
-    }
+			String title, desc, date;
+			boolean completed;
+			Task task;
 
-    ///////////////////////// END OF TODO ////////////////////////////
+			while ((line = myReader.readLine()) != null) {
+				data = line.split(",");
+				title = data[0];
+				desc = data[1];
+				date = data[2];
 
-    // Initialize tasks and GUI, populate with test data (if applicable).
-    private void init() {
-        filepath = getNotesDirectoryPath();
-        initTasks();
-        testData();
-    }
+				completed = "true".contentEquals(data[3]);
+				task = new Task(title, desc, date);
+				if (completed)
+					task.toggleComplete();
 
-    // Identify the operating system of the user, and obtain the path to the "tasks" directory.
-    private String getNotesDirectoryPath() {
-        String os = System.getProperty("os.name").toLowerCase();
+				tasks.add(task);
+			}
+		} catch (FileNotFoundException e) {
+			System.out.println("File error! File not found.");
+			e.printStackTrace();
+		} catch (IOException e1) {
+			System.out.println("IOException apparently");
+			e1.printStackTrace();
+		}
+	}
 
-        String userHome = System.getProperty("user.home");
-        String tasksDir = "tasks";
+	// Writes each task to the file after a change.
+	private static void saveTasks() {
+		System.out.println("writing tasks to " + filepath);
+		try (BufferedWriter myWriter = new BufferedWriter(
+				new FileWriter(filepath))) {
+			myWriter.flush();
+			String line;
 
-        if (os.contains("win")) // Windows
-            return userHome + "\\" + tasksDir;
-        else if (os.contains("mac")) // MacOS
-            return userHome + "/Library/Application Support/" + tasksDir;
-        else // Linux/other
-            return userHome + "/" + tasksDir;
-    }
+			String title, desc, date;
+			boolean completed;
 
-    // Create the tasks file if it does not already exist. Load tasks from the existing file otherwise.
-    private void initTasks() {
-        File f = new File(filepath);
-        tasks = new ArrayList<Task>();
+			for (Task task : tasks) {
+				title = task.getTitle();
+				desc = task.getDescription();
+				date = task.getDueDate();
+				completed = task.isCompleted();
+				line = String.format("%s,%s,%s,%b", title, desc, date,
+						completed);
 
-        if(f.isFile()) { 
-            System.out.println("loading tasks from " + filepath);
-            parse(f);
-        } else {
-            try {
-                f.createNewFile();
-                System.out.println(filepath + " has been created.");
-            } catch(Exception e) {
-                System.out.println(e);
-            }
-        }
-    }
+				myWriter.append(line);
+				myWriter.newLine();
+			}
+		} catch (FileNotFoundException e) {
+			System.out.println("File error! File not found.");
+			e.printStackTrace();
+		} catch (IOException e1) {
+			System.out.println("IOException apparently");
+			e1.printStackTrace();
+		}
+	}
 
-    // Test tasks, not read from a file and are not intended to be saved to a file.
-    private void testData() {
-        for(int i = 0; i < 10; i++)
-            tasks.add(new Task("Title " + i, "Description " + i, "Due Date " + i));
-    }
+	///////////////////////// END OF TODO ////////////////////////////
 
-    public static void main(String[] args) {
-        new Week9().init();
-        ActionListener sortByTitle = new ActionListener() {
-            public void actionPerformed(ActionEvent e) { 
-                sortByTitle();
-            }
-        };
+	// Initialize tasks and GUI, populate with test data (if applicable).
+	private void init() {
+		filepath = getNotesDirectoryPath();
+		initTasks();
+		testData();
+	}
 
-        ActionListener sortByDueDate = new ActionListener() {
-            public void actionPerformed(ActionEvent e) { 
-                sortByDueDate();
-            }
-        };
+	// Identify the operating system of the user, and obtain the path to the
+	// "tasks" directory.
+	private String getNotesDirectoryPath() {
+		String os = System.getProperty("os.name").toLowerCase();
 
-        ActionListener filterByCompleted = new ActionListener() {
-            public void actionPerformed(ActionEvent e) { 
-                filterByComplete();
-            }
-        };
+		String userHome = System.getProperty("user.home");
+		String tasksDir = "tasks";
 
-        gui = new Week9Gui(tasks, sortByTitle, sortByDueDate, filterByCompleted);
-    }
+		if (os.contains("win")) // Windows
+			return userHome + "\\" + tasksDir;
+		else if (os.contains("mac")) // MacOS
+			return userHome + "/Library/Application Support/" + tasksDir;
+		else // Linux/other
+			return userHome + "/" + tasksDir;
+	}
+
+	// Create the tasks file if it does not already exist. Load tasks from the
+	// existing file otherwise.
+	private void initTasks() {
+		File f = new File(filepath);
+		tasks = new ArrayList<Task>();
+
+		if (f.isFile()) {
+			System.out.println("loading tasks from " + filepath);
+			parse(f);
+		}
+		else {
+			try {
+				f.createNewFile();
+				System.out.println(filepath + " has been created.");
+			} catch (Exception e) {
+				System.out.println(e);
+			}
+		}
+	}
+
+	// Test tasks, not read from a file and are not intended to be saved to a
+	// file.
+	private void testData() {
+		for (int i = 0; i < 10; i++)
+			tasks.add(new Task("Title " + i, "Description " + i,
+					"Due Date " + i));
+		saveTasks();
+	}
+
+	public static void main(String[] args) {
+		new Week9().init();
+		ActionListener sortByTitle = new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				sortByTitle();
+			}
+		};
+
+		ActionListener sortByDueDate = new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				sortByDueDate();
+			}
+		};
+
+		ActionListener filterByCompleted = new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				filterByComplete();
+			}
+		};
+
+		gui = new Week9Gui(tasks, sortByTitle, sortByDueDate,
+				filterByCompleted);
+	}
 
 }
