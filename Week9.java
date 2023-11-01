@@ -1,7 +1,13 @@
 import java.awt.event.*;
 
 import java.util.ArrayList;
+import java.util.Scanner;
+
+import javax.swing.JOptionPane;
+
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 public class Week9 {
     private static ArrayList<Task> tasks;
@@ -28,11 +34,22 @@ public class Week9 {
         // TODO
         gui.update(tasks);
     }
+    
+    //addBtn Method
+    private static void addBtn() {
+    	String[] strs = new String[3];
+    		strs[0] = JOptionPane.showInputDialog("Please Enter A Title:");
+    		strs[1] = JOptionPane.showInputDialog("Please Enter A Discription:");
+    		strs[2] = JOptionPane.showInputDialog("Please Enter A Due Date:");
 
-    private void parse(File f) {
+    		
+    }
+
+    private void parse(File f) throws IOException {
         // TODO: Need to open the file and get each line.
         // TODO: Parse the format ("TITLE, DESCRIPTION, DUE DATE, COMPLETED"), 
         // TODO: Create a new Task object and add it to the ArrayList.
+    	
     }
 
     // Writes each task to the file after a change.
@@ -72,7 +89,12 @@ public class Week9 {
 
         if(f.isFile()) { 
             System.out.println("loading tasks from " + filepath);
-            parse(f);
+            try {
+				parse(f);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
         } else {
             try {
                 f.createNewFile();
@@ -108,8 +130,14 @@ public class Week9 {
                 filterByComplete();
             }
         };
+        
+        ActionListener addBtn = new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				addBtn();
+			}
+		}; 
 
-        gui = new Week9Gui(tasks, sortByTitle, sortByDueDate, filterByCompleted);
+        gui = new Week9Gui(tasks, sortByTitle, sortByDueDate, filterByCompleted, addBtn);
     }
 
 }
