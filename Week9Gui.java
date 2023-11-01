@@ -9,6 +9,7 @@ import javax.swing.UIManager;
 
 import java.awt.event.*;
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 
 public class Week9Gui {
@@ -17,29 +18,31 @@ public class Week9Gui {
     private ActionListener titleSort;
     private ActionListener dueDateSort;
     private ActionListener completeFilter;
+    private ActionListener addBtn;
 
-    public Week9Gui(ArrayList<Task> tasks, ActionListener titleSort, ActionListener dueDateSort, ActionListener completeFilter) {
+    public Week9Gui(ArrayList<Task> tasks, ActionListener titleSort, ActionListener dueDateSort, ActionListener completeFilter, ActionListener addBtn) {
         this.titleSort = titleSort;
         this.dueDateSort = dueDateSort;
         this.completeFilter = completeFilter;
-
+        this.addBtn = addBtn;
         initGui(tasks);
     }
 
     // Setup the basic GUI layout.
     private void initGui(ArrayList<Task> tasks) {
-        frame.setDefaultCloseOperation(frame.EXIT_ON_CLOSE);
-        frame.setLayout(new BorderLayout());
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.getContentPane().setLayout(new BorderLayout());
         frame.setLocationRelativeTo(null);
-
+        frame.setPreferredSize(new Dimension(600, 450));
+        frame.setSize(frame.getPreferredSize());
         try {
             UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
         } catch (Exception e) {
             System.out.println("Error with cross platform look & feel.");
         }
 
-        frame.add(buttonsView(), BorderLayout.PAGE_END);
-        frame.add(view(tasks));
+        frame.getContentPane().add(buttonsView(), BorderLayout.PAGE_END);
+        frame.getContentPane().add(view(tasks));
 
         frame.setVisible(true);
     }
@@ -54,14 +57,21 @@ public class Week9Gui {
 
         JButton filterByComplete = new JButton("Complete");
             filterByComplete.addActionListener(completeFilter);
+        
+        JButton addBtn = new JButton("Add");
+           	addBtn.addActionListener(this.addBtn);
+            
+            
 
-        JPanel p = new JPanel(new GridLayout(2, 3));
+        JPanel p = new JPanel(new GridLayout(0, 4));
             p.add(new JLabel("Sort by:"));
             p.add(new JLabel("Sort by:"));
             p.add(new JLabel("Filter by:"));
+            p.add(new JLabel("Add to:"));
             p.add(sortByTitle);
             p.add(sortByDueDate);
             p.add(filterByComplete);
+            p.add(addBtn);
 
         return p;
     }
@@ -87,8 +97,8 @@ public class Week9Gui {
     // Clear everything and refresh the JFrame to update information.
     public void update(ArrayList<Task> tasks) {
         frame.getContentPane().removeAll();
-        frame.add(buttonsView(), BorderLayout.PAGE_END);
-        frame.add(view(tasks));
+        frame.getContentPane().add(buttonsView(), BorderLayout.PAGE_END);
+        frame.getContentPane().add(view(tasks));
             frame.repaint();
             frame.revalidate();
             frame.pack();
