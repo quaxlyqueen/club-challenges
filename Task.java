@@ -63,16 +63,17 @@ public class Task {
 			int length = Math.min(tokens1.length, tokens2.length);
 
 			for (int i = 0; i < length; i++) {
-				if (Character.isLetter(tokens1[i].charAt(0)) && Character.isLetter(tokens2[i].charAt(0))) {
-					int stringCompare = tokens1[i].compareTo(tokens2[i]);
-					
-					if (stringCompare != 0) 
-						return stringCompare;
-				} else {
+				if (Character.isDigit(tokens1[i].charAt(0)) && Character.isDigit(tokens2[i].charAt(0))) {
 					int intCompare = Integer.compare(Integer.parseInt(tokens1[i]), Integer.parseInt(tokens2[i]));
-					
-					if (intCompare != 0) 
+
+					if (intCompare != 0)
 						return intCompare;
+				} else {
+
+					int stringCompare = tokens1[i].compareTo(tokens2[i]);
+
+					if (stringCompare != 0)
+						return stringCompare;
 				}
 			}
 

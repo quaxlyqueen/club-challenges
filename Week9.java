@@ -154,6 +154,7 @@ public class Week9 {
 	// Test tasks, not read from a file and are not intended to be saved to a file.
 	private void testData() {
 		tasks.add(new Task("Title 1000", "Description ", "Due Date "));
+		tasks.add(new Task("100 Title", "Description ", "Due Date "));
 		for (int i = 20; i > 0; i--)
 			tasks.add(new Task("Title " + i, "Description " + i, "Due Date " + i));
 	}
