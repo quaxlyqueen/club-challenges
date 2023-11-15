@@ -64,7 +64,7 @@ public class App {
     }
 
     public static void main(String[] args) {
-        if(collatzSequence() != 837799) System.out.println("Solution is incorrect...");
+        if(collatzSequence() != 837799) System.out.println("Your solution is incorrect...");
         else System.out.println("Your Collatz Sequence solution is correct!");
 
         if(countingSundays() != 171) System.out.println("Your solution is incorrect...");

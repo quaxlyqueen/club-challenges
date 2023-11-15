@@ -1,0 +1,4 @@
+#!/bin/zsh
+
+javac *.java
+java App
