@@ -15,24 +15,6 @@ public class Panel extends JPanel {
     }
 
     private void init() {
-        setBackground(bg);
-        setForeground(fg);
-
-        Button b = new Button("Example text", new Color(160, 32, 240), Color.WHITE);
-            b.addActionListener(
-                e -> {
-                    System.out.println("Button action.");
-                }
-            );
-
-        Button b2 = new Button("Example 2 text", new Color(160, 32, 240), Color.WHITE);
-            b2.addActionListener(
-                e -> {
-                    System.out.println("Button 2 action.");
-                }
-            );
-
-        add(b);
-        add(b2);
+        // TODO: Add 2 buttons to the Panel object, and set the background and foreground colors.
     }
 }

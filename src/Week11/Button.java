@@ -40,36 +40,9 @@ public class Button extends JButton {
 
     // Apply hover functionality to all buttons, as well as removing certain default stylings.
     private void applyCommon() {
-        addMouseListener(
-                new MouseListener() {
-                    @Override
-                    public void mouseClicked(MouseEvent e) {}
-
-                    @Override
-                    public void mousePressed(MouseEvent e) {}
-
-                    @Override
-                    public void mouseReleased(MouseEvent e) {}
-
-                    @Override
-                    public void mouseEntered(MouseEvent e) {
-                        select();
-                        repaint();
-                        revalidate();
-                    }
-
-                    @Override
-                    public void mouseExited(MouseEvent e) {
-                        deselect();
-                        repaint();
-                        revalidate();
-                    }
-                });
+        // TODO: Implement hover functionality.
 
         setFocusPainted(false);
         setBorder(new EmptyBorder(3,3,3,3));
-
-        repaint();
-        revalidate();
     }
 }
