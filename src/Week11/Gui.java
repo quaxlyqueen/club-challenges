@@ -1,9 +1,6 @@
-import javax.swing.JFrame;
-import javax.swing.UIManager;
+import javax.swing.*;
 
-import java.awt.Color;
-import java.awt.BorderLayout;
-import java.awt.Dimension;
+import java.awt.*;
 
 public class Gui extends JFrame {
     public Gui() {

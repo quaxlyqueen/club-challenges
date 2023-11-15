@@ -1,7 +1,6 @@
-import javax.swing.JPanel;
+import javax.swing.*;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
+import java.awt.*;
 
 public class Panel extends JPanel {
     private Color bg;
@@ -19,6 +18,21 @@ public class Panel extends JPanel {
         setBackground(bg);
         setForeground(fg);
 
-        add(new Button("Example text", new Color(160, 32, 240), Color.WHITE));
+        Button b = new Button("Example text", new Color(160, 32, 240), Color.WHITE);
+            b.addActionListener(
+                e -> {
+                    System.out.println("Button action.");
+                }
+            );
+
+        Button b2 = new Button("Example 2 text", new Color(160, 32, 240), Color.WHITE);
+            b2.addActionListener(
+                e -> {
+                    System.out.println("Button 2 action.");
+                }
+            );
+
+        add(b);
+        add(b2);
     }
 }

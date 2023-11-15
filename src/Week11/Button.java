@@ -1,43 +1,44 @@
-import javax.swing.JButton;
-import javax.swing.border.EmptyBorder;
+import javax.swing.*;
+import javax.swing.border.*;
 
+import java.awt.*;
+import java.awt.event.*;
 import java.awt.Color;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 
 public class Button extends JButton {
     private boolean selected;
     private Color bg;
     private Color fg;
 
+    /**
+     * @param String buttonLabel
+     * @param Color fg
+     * @param Color bg
+     */
     public Button(String buttonLabel, Color bg, Color fg) {
         super(buttonLabel);
             this.bg = bg;
             this.fg = fg;
 
+        applyCommon();
         deselect();
     }
 
+    // Apply default appearance to the button upon exiting the bounds.
     public void deselect() {
         selected = false;
-        applyDefaultStyle();
-    }
-
-    public void select() {
-        selected = true;
-        applyFocusedStyle();
-    }
-
-    private void applyDefaultStyle() {
         setBackground(bg);
         setForeground(fg);
     }
 
-    private void applyFocusedStyle() {
+    // Apply focused appearance to the button upon hover.
+    public void select() {
+        selected = true;
         setBackground(fg);
         setForeground(bg);
     }
 
+    // Apply hover functionality to all buttons, as well as removing certain default stylings.
     private void applyCommon() {
         addMouseListener(
                 new MouseListener() {
@@ -53,11 +54,15 @@ public class Button extends JButton {
                     @Override
                     public void mouseEntered(MouseEvent e) {
                         select();
+                        repaint();
+                        revalidate();
                     }
 
                     @Override
                     public void mouseExited(MouseEvent e) {
                         deselect();
+                        repaint();
+                        revalidate();
                     }
                 });
 
