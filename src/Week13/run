@@ -1,6 +1,6 @@
 #!/bin/zsh
 
 javac *.java
-java App
+java SNAFUChallenge
 
 rm *.class

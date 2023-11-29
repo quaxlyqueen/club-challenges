@@ -1,3 +1,8 @@
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Scanner;
+import java.io.File;
+
 public class App {
 
     /**
@@ -19,7 +24,34 @@ public class App {
      * @return starting number of the longest Collatz Sequence
      */
     private static int collatzSequence() {
-        return 1; // TODO
+        int n = 1;
+        int maxChain = 0;
+        int correctNum = 0;
+
+        while (n < 1_000_000) {
+            int chainLength = collatz(n, 0);
+
+            if (chainLength > maxChain) {
+                maxChain = chainLength;
+                correctNum = n;
+            }
+
+            n--;
+        }
+
+        System.out.println(correctNum);
+        return correctNum;
+    }
+
+    private static int collatz(int n, int chainLength) {
+        if(n == 1) return ++chainLength; // Base case and final link.
+
+        if(n % 2 == 0) n /= 2;
+        else n = (3 * n) + 1;
+
+        ++chainLength;
+
+        return collatz(n, chainLength);
     }
 
     /**
@@ -60,17 +92,65 @@ public class App {
      * @return the total of the name scores.
      */
     private static int nameScores() {
-        return 1; // TODO
+        ArrayList<String> names = readNames();
+        int sum = 0;
+
+        Collections.sort(names);
+
+        int counter = 1;
+        for (String name : names) {
+            int nameScore = 0;
+            char[] n = name.toCharArray();
+            for (char c : n) {
+                nameScore += (c - 64);
+            }
+
+            nameScore *= counter;
+            sum+= nameScore;
+
+            counter++;
+        }
+
+        System.out.println("sum of name scores: " + sum);
+        return sum;
+    }
+
+    private static ArrayList<String> readNames() {
+        ArrayList<String> list = new ArrayList<>();
+
+        File f = new File("names.txt");
+
+        try (Scanner scan = new Scanner(f)) {
+            String str = scan.nextLine();
+
+            String[] strings = str.split(",");
+
+            for (String s : strings)
+                list.add(s.substring(1, s.length() - 1));
+
+        } catch (Exception e) {
+            System.out.println("Error reading file.");
+        }
+
+        return list;
+    }
+
+    private static void printNames(ArrayList<String> names) {
+        for (String name : names)
+            System.out.println(name);
     }
 
     public static void main(String[] args) {
+        //System.out.println(collatz(13, 0));
         if(collatzSequence() != 837799) System.out.println("Your solution is incorrect...");
         else System.out.println("Your Collatz Sequence solution is correct!");
 
+        /*
         if(countingSundays() != 171) System.out.println("Your solution is incorrect...");
         else System.out.println("Your Counting Sundays solution is correct!");
 
         if(nameScores() != 871198282) System.out.println("Your solution is incorrect...");
         else System.out.println("Your Name Scores solution is correct!");
+        */
     }
 }
