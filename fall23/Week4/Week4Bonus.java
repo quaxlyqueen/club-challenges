@@ -1,7 +1,9 @@
+package fall23.Week4;
+
 /**
  * In this week's club bonus challenge, you will be tasked with solving grid traversal problem.
  */
-public class Week4 {
+public class Week4Bonus {
 
     /**
      * In a 2x2 grid, there are exactly 6 routes from the top-left corner to the bottom-right corner.
@@ -21,6 +23,6 @@ public class Week4 {
     public static void main(String[] args) {
         long ans1 = problem1();
 
-        System.out.println(ans1 == 137846528820 ? "Problem 1 is correct!" : "Problem 1 (" + ans1 + ") is not correct...");
+        System.out.println(ans1 == 137846528820L ? "Problem 1 is correct!" : "Problem 1 (" + ans1 + ") is not correct...");
     }
 }

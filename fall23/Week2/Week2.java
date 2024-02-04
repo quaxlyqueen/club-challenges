@@ -1,3 +1,5 @@
+package fall23.Week2;
+
 /**
  * Sum of Multiples of 3 or 5.
  *
