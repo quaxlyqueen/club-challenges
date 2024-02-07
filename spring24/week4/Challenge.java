@@ -112,7 +112,7 @@ public class Challenge {
 	
 	// Test driver for the three coding challenges.
 	public static void main(String[] args) {
-		File f = new File("Example.txt");
+		File f = new File("Example.txt"); // TODO: Identify the correct path for your OS and IDE/editor.
 		String s = readFile(f);
 		ArrayList<String> list = split(s);
 		double result = calculate(list);
