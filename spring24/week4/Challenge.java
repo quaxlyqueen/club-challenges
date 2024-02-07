@@ -28,7 +28,7 @@ public class Challenge {
 		
 		// TODO: Convert your variable to a String variable.
 		
-		return null; // TODO: Return the variable.
+		return ""; // TODO: Return the variable.
 	}
 	
 	/**
@@ -112,7 +112,7 @@ public class Challenge {
 	
 	// Test driver for the three coding challenges.
 	public static void main(String[] args) {
-		File f = new File("Example.txt"); // TODO: Identify the correct path for your OS and IDE/editor.
+		File f = new File("spring24/week4/Example.txt");
 		String s = readFile(f);
 		ArrayList<String> list = split(s);
 		double result = calculate(list);
