@@ -60,76 +60,58 @@ public class Challenge {
 	 * @param tokens
 	 */
 	public double calculate(ArrayList<String> tokens) {
-        System.out.println("tokens: ");
-        for(String t : tokens) {
-            System.out.print(t + " ");
-        }
-        System.out.println();
-
         Stack numbers = new Stack();
         Stack operations = new Stack();
-        double result = 0.0;
+        double r = 0.0;
 
         for(int i = 0; i < tokens.size(); i++) {
             String token = tokens.get(i);
 
+            // Add the token to the number or operation stack.
             if(!token.equals("(") && !token.equals(")")) {
-                // Detect and add either the operation token or the numerical token.
-                if(isOperation(token)) operations.add(token);
-                else numbers.add(token);
+                if(isOperation(token)) operations.insert(token);
+                else numbers.insert(token);
 
                 continue;
-            }
+            } 
 
+            // If the token is an opening parenthesis, evaluate the expression inside the matching closing parenthesis.
             if(token.equals("(")) {
-                int startIndex = i + 1; // The index of the first token after the opening parenthesis.
-                int endIndex = 0;
+                int deepness = 1;
+                int startIndex = i + 1;
 
+                // Find the matching closing parenthesis.
                 for(int j = startIndex; j < tokens.size(); j++) {
-                    String subToken = tokens.get(j);
+                    if(tokens.get(j).equals("(")) deepness++;
+                    if(tokens.get(j).equals(")")) deepness--;
 
-                    // Detect and add either the operation token or the numerical token.
-                    if(!subToken.equals("(") && !subToken.equals(")")) {
-                        if(isOperation(subToken)) operations.add(subToken);
-                        else numbers.add(subToken);
+                    if(deepness == 0) {
+                        // Evaluate the expression inside the parenthesis.
+                        double result = calculate(new ArrayList<String>(tokens.subList(startIndex, j)));
+                        numbers.insert(Double.toString(result));
 
-                        continue;
-                    }
-
-                    // Detect another opening parenthesis and set the start index to the next token.
-                    if(subToken.equals("(")) {
-                        startIndex = j + 1;
-                    }
-
-                    // Detect the closing parenthesis and set the end index to the current token.
-                    if(subToken.equals(")")) {
-                        endIndex = j;
-                        i = endIndex;
+                        // Skip the rest of the parenthesis.
+                        i = j;
                         break;
                     }
                 }
-
-                while(numbers.size() > 1) {
-                    numbers.insert("" + evaluate(numbers.pop(), operations.pop(), numbers.pop()));
-                }
-
-                List<String> subTokens = tokens.subList(startIndex, endIndex);
-                ArrayList<String> subList = new ArrayList<>(subTokens);
-                numbers.insert("" + calculate(subList));
-
-                continue;
-            }
+            } 
         }
 
-        return evaluate(numbers.pop(), operations.pop(), numbers.pop());
+        // Evaluate the remaining operations and numbers.
+        while(numbers.isNotEmpty() && operations.isNotEmpty()) {
+            r = evaluate(numbers.pop(), operations.pop(), numbers.pop());
+            numbers.insert(Double.toString(r));
+        }
+
+        // Return the result, rounded to 4 decimal places.
+        return Math.round(r * 10000.0) / 10000.0;
 	}
 
     private double evaluate(String a, String o, String b) {
         double x = Double.parseDouble(a);
         double y = Double.parseDouble(b);
         char op = o.charAt(0);
-
-        System.out.println("evaluating " + x + " " + op + " " + y);
 
         switch(op) {
             case '+':
