@@ -1,9 +1,8 @@
-package spring24.week4;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.List;
 
 public class Challenge {
 
@@ -15,20 +14,20 @@ public class Challenge {
 	 * @param f
 	 * @return
 	 */
-	public static String readFile(File f) {
+	public String readFile(File f) {
 		if(f == null) return null; // Catch if the File does not exist.
-		
-		// TODO: Create a variable, potentially an object like ArrayList or StringBuilder or even the humble String, to store Strings that are read in from the file.
+        StringBuilder sb = new StringBuilder();
 		
 		try (Scanner s = new Scanner(f)){
-			// TODO: Populate the variable from above with Strings from the file.
+            while(s.hasNextLine())
+                sb.append(s.nextLine());
+
+            return sb.toString();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
 		
-		// TODO: Convert your variable to a String variable.
-		
-		return ""; // TODO: Return the variable.
+		return "";
 	}
 	
 	/**
@@ -40,10 +39,12 @@ public class Challenge {
 	 * @param s
 	 * @return
 	 */
-	public static ArrayList<String> split(String s) {
+	public ArrayList<String> split(String s) {
 		ArrayList<String> list = new ArrayList<String>();
-		
-		// TODO: Take the input String array s and add each separate word (separated by a space) to the ArrayList.
+        String[] tokens = s.split(" ");
+
+        for(int i = 0; i < tokens.length; i++)
+            list.add(tokens[i]);
 		
 		return list;
 	}
@@ -58,15 +59,222 @@ public class Challenge {
 	 * 
 	 * @param tokens
 	 */
-	public static double calculate(ArrayList<String> tokens) {
-		return 0.0; // TODO: Implement this method.
+	public double calculate(ArrayList<String> tokens) {
+        System.out.println("tokens: ");
+        for(String t : tokens) {
+            System.out.print(t + " ");
+        }
+        System.out.println();
+
+        Stack numbers = new Stack();
+        Stack operations = new Stack();
+        double result = 0.0;
+
+        for(int i = 0; i < tokens.size(); i++) {
+            String token = tokens.get(i);
+
+            if(!token.equals("(") && !token.equals(")")) {
+                // Detect and add either the operation token or the numerical token.
+                if(isOperation(token)) operations.add(token);
+                else numbers.add(token);
+
+                continue;
+            }
+
+            if(token.equals("(")) {
+                int startIndex = i + 1; // The index of the first token after the opening parenthesis.
+                int endIndex = 0;
+
+                for(int j = startIndex; j < tokens.size(); j++) {
+                    String subToken = tokens.get(j);
+
+                    // Detect and add either the operation token or the numerical token.
+                    if(!subToken.equals("(") && !subToken.equals(")")) {
+                        if(isOperation(subToken)) operations.add(subToken);
+                        else numbers.add(subToken);
+
+                        continue;
+                    }
+
+                    // Detect another opening parenthesis and set the start index to the next token.
+                    if(subToken.equals("(")) {
+                        startIndex = j + 1;
+                    }
+
+                    // Detect the closing parenthesis and set the end index to the current token.
+                    if(subToken.equals(")")) {
+                        endIndex = j;
+                        i = endIndex;
+                        break;
+                    }
+                }
+
+                while(numbers.size() > 1) {
+                    numbers.insert("" + evaluate(numbers.pop(), operations.pop(), numbers.pop()));
+                }
+
+                List<String> subTokens = tokens.subList(startIndex, endIndex);
+                ArrayList<String> subList = new ArrayList<>(subTokens);
+                numbers.insert("" + calculate(subList));
+
+                continue;
+            }
+        }
+
+        return evaluate(numbers.pop(), operations.pop(), numbers.pop());
 	}
+
+    private double evaluate(String a, String o, String b) {
+        double x = Double.parseDouble(a);
+        double y = Double.parseDouble(b);
+        char op = o.charAt(0);
+
+        System.out.println("evaluating " + x + " " + op + " " + y);
+
+        switch(op) {
+            case '+':
+                return x + y;
+            case '-':
+                return x - y;
+            case '*':
+                return x * y;
+            case '/':
+                return x / y;
+            case '%':
+                return x % y;
+        }
+
+        return 0.0;
+    }
+
+    private boolean isOperation(String token) {
+        String[] allowedOperations = {
+            "+",
+            "-",
+            "*",
+            "/",
+            "%"
+        };
+
+        // Determine if the token is an operation symbol.
+        for(int i = 0; i < allowedOperations.length; i++)
+            if(token.equals(allowedOperations[i])) return true;
+
+        return false;
+    }
 	
-	public static boolean testChallenge1(String s) {
+    private class Stack {
+        private Node head;
+        private Node tail;
+
+        private int size;
+
+        public Stack() {
+            head = null;
+            tail = null;
+            size = 0;
+        }
+
+        public Stack(String value) {
+            head = new Node(value);
+            tail = null;
+            size = 1;
+        }
+
+        public int size() {
+            return size;
+        }
+
+        public void insert(String value) {
+            Node next = new Node(value);
+            if(head == null) {
+                head = next;
+                size++;
+                return;
+            }
+
+            if(tail == null) {
+                tail = next;
+                head.next = tail;
+                size++;
+                return;
+            }
+
+            tail.next = next;
+            tail = next;
+            tail.next = null;
+            size++;
+        }
+
+        public void add(String value) {
+            Node next = new Node(value);
+            if(head == null) {
+                head = next;
+                size++;
+                return;
+            }
+
+            if(tail == null) {
+                tail = next;
+                head.next = tail;
+                size++;
+                return;
+            }
+
+            tail.next = next;
+            tail = next;
+            tail.next = null;
+            size++;
+        }
+
+        public boolean isNotEmpty() {
+            return size > 0;
+        }
+
+        public String pop() {
+            if(head == null) {
+                System.out.println("the stack has ran out of elements!");
+                return "0";
+            }
+
+            Node next = head;
+            if(head.next == null) {
+                size --;
+                head = null;
+                tail = null;
+                return next.value;
+            }
+
+            head = head.next;
+            size--;
+
+            return next.value;
+        }
+
+        public void print() {
+            Node current = head;
+
+            while(current != null) {
+                System.out.println(current.value);
+                current = current.next;
+            }
+        }
+
+        private class Node {
+            public String value;
+            public Node next;
+
+            public Node(String value) {
+                this.value = value;
+            }
+        }
+    }
+
+	public boolean testChallenge1(String s) {
 		return s.equals("( ( 5 + 5 ) * 5 * 3 ) / ( 5 * 3 + ( 8 * 4 ) )");
 	}
 	
-	public static boolean testChallenge2(ArrayList<String> list) {
+	public boolean testChallenge2(ArrayList<String> list) {
 		// Don't do this to answer Challenge 2. This is the only way to not give away a solution.
 		ArrayList<String> expected = new ArrayList<>();
 			expected.add("(");
@@ -79,6 +287,7 @@ public class Challenge {
 			expected.add("5");
 			expected.add("*");
 			expected.add("3");
+			expected.add(")");
 			expected.add("/");
 			expected.add("(");
 			expected.add("5");
@@ -91,7 +300,7 @@ public class Challenge {
 			expected.add("4");
 			expected.add(")");
 			expected.add(")");
-			
+
 		if(expected.size() != list.size()) {
 			System.out.println("Your solution for Challenge 2 does not correctly tokenize! You have too few or too many elements.");
 			return false;
@@ -106,24 +315,27 @@ public class Challenge {
 		return true;
 	}
 	
-	public static boolean testChallenge3(double result) {
+	public boolean testChallenge3(double result) {
 		return result == 3.1915;
 	}
 	
 	// Test driver for the three coding challenges.
 	public static void main(String[] args) {
-		File f = new File("spring24/week4/Example.txt");
-		String s = readFile(f);
-		ArrayList<String> list = split(s);
-		double result = calculate(list);
+        Challenge c = new Challenge();
+
+		File f = new File("Example.txt");
+		String s = c.readFile(f);
+        //System.out.println(s);
+		ArrayList<String> list = c.split(s);
+		double result = c.calculate(list);
 		
 		System.out.print("Challenge 1 - ");
-		System.out.println(testChallenge1(s) ? "Correct!\n" : "Incorrect.\n");
+		System.out.println(c.testChallenge1(s) ? "Correct!\n" : "Incorrect.\n");
 		
 		System.out.print("Challenge 2 - ");
-		System.out.println(testChallenge2(list) ? "Correct!\n" : "Incorrect.\n");
+		System.out.println(c.testChallenge2(list) ? "Correct!\n" : "Incorrect.\n");
 		
 		System.out.print("Challenge 3 - ");
-		System.out.println(testChallenge3(result) ? "Correct!\n" : "Incorrect.\n");
+		System.out.println(c.testChallenge3(result) ? "Correct!\n" : "Incorrect.\n");
 	}
 }
