@@ -1,0 +1,6 @@
+#!/bin/zsh
+
+javac Challenge.java
+java Challenge
+
+rm *.class
