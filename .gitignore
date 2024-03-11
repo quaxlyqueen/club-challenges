@@ -10,3 +10,6 @@
 /Task$CompareByTitle.class
 /Week9$4.class
 /Task$SortByTitleComparator.class
+.vscode
+.classpath
+.project

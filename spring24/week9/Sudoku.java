@@ -44,13 +44,13 @@ public class Sudoku {
 
     public static void main(String[] args) {
         System.out.println("Welcome to the Sudoku Solver!");
-        System.out.println("Let's solve a Sudoku puzzle.");
 
         Scanner in = new Scanner(System.in);
             System.out.print("Enter the name of the input file (do not include the file extension): ");
             String inputFilename = in.nextLine();
             System.out.print("Enter the name of the output file (do not include the file extension): ");
             String outputFilename = in.nextLine();
+        in.close();
 
         Sudoku app = new Sudoku();
             Cell[][] grid = app.readPuzzle(inputFilename);
@@ -65,7 +65,7 @@ public class Sudoku {
      * @return
      */
     public Cell[][] readPuzzle(String filename) {
-        System.out.println("TODO: Read sudoku puzzle solution from " + filename);
+        System.out.println("TODO: Read sudoku puzzle solution from " + filename + ".sdku");
         // TODO: Account for possible invalid input file and handle an error.
         // TODO: Spaces in the file should be represented as '.' in the grid.
         // TOOD: Read the file's puzzle.
@@ -79,7 +79,7 @@ public class Sudoku {
      * @return
      */
     public void saveSolution(String filename, Cell[][] grid) {
-        System.out.println("TODO: Write sudoku puzzle solution to " + filename);
+        System.out.println("TODO: Write sudoku puzzle solution to " + filename + ".sdku");
         // TODO: Account for possible invalid solution from isSolved and handle an error.
         // TODO: Write the solution to the file.
     }
@@ -109,7 +109,7 @@ public class Sudoku {
         // TODO: Given the rules of Sudoku, solve the puzzle.
 
         // HINT: Use the getAvailableNumbers method to find the available numbers for each cell.
-        // HINT: Use the isSolved method to check if the puzzle is solved.
+        // HINT: Use the isValidSolution method to check if the puzzle is solved.
         // HINT: Assume the puzzle is solvable and has only one solution.
         System.out.println("TODO: Solve the Sudoku puzzle");
     }
@@ -219,7 +219,77 @@ public class Sudoku {
      * @param grid a 9x9 grid of numbers
      * @return true if the grid is a valid Sudoku puzzle, and false otherwise
      */
-    private boolean isSolved(Cell[][] grid) {
-        return false; // TODO: I need to do this before club.
+    private boolean isValidSolution(Cell[][] grid) {
+        // Check that every cell has a value between 1 and 9.
+        for(int i = 0; i < 9; i++) {
+            for(int j = 0; j < 9; j++) {
+                if(grid[i][j].getValue() < 1 || grid[i][j].getValue() > 9) {
+                    System.out.println("Cell at row " + i + " and column " + j + " has an invalid value.");
+                    return false;
+                }
+            }
+        }
+        
+        // Check that every row contains the numbers 1-9 exactly once.
+        for(int i = 0; i < 9; i++) {
+            int[] row = new int[9];
+            for(int j = 0; j < 9; j++) {
+                row[j] = grid[i][j].getValue();
+            }
+            if(!isValidSet(row)) {
+                System.out.println("Row " + i + " is invalid.");
+                return false;
+            }
+        }
+
+        // Check that every column contains the numbers 1-9 exactly once.
+        for(int i = 0; i < 9; i++) {
+            int[] col = new int[9];
+            for(int j = 0; j < 9; j++) {
+                col[j] = grid[j][i].getValue();
+            }
+            if(!isValidSet(col)) {
+                System.out.println("Column " + i + " is invalid.");
+                return false;
+            }
+        }
+
+        // Check that every 3x3 subgrid contains the numbers 1-9 exactly once.
+        for(int i = 0; i < 3; i++) {
+            for(int j = 0; j < 3; j++) {
+                int[] box = new int[9];
+                for(int k = 0; k < 3; k++) {
+                    for(int l = 0; l < 3; l++) {
+                        box[k * 3 + l] = grid[i * 3 + k][j * 3 + l].getValue();
+                    }
+                }
+                if(!isValidSet(box)) {
+                    System.out.println("Box at row " + i + " and column " + j + " is invalid.");
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+    
+    /**
+     * Given an array of 9 numbers, return true if the array contains the numbers 1-9 exactly once, and false otherwise.
+     * 
+     * @param set an array of 9 numbers
+     * @return true if the array contains the numbers 1-9 exactly once, and false otherwise
+     */
+    private boolean isValidSet(int[] set) {
+        boolean[] found = new boolean[9];
+        for(int i = 0; i < 9; i++) {
+            if(set[i] < 1 || set[i] > 9) {
+                return false;
+            } else if(found[set[i] - 1]) {
+                return false;
+            } else {
+                found[set[i] - 1] = true;
+            }
+        }
+        return true;
     }
 }
