@@ -1,7 +1,10 @@
 package spring24.week9;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
+
 
 /**
  * A Sudoku puzzle is a 9x9 grid of numbers, where each row, column, and 3x3 subgrid contains the numbers 1-9 exactly once.
@@ -55,7 +58,14 @@ public class Sudoku {
         Sudoku app = new Sudoku();
             Cell[][] grid = app.readPuzzle(inputFilename);
             app.solve(grid);
-            app.saveSolution(outputFilename, grid);
+            System.out.println("The solution to the Sudoku puzzle is:");
+            for(int i = 0; i < 9; i++) {
+                for(int j = 0; j < 9; j++) {
+                    System.out.print(grid[i][j].getValue());
+                }
+                System.out.println();
+            }
+            //app.saveSolution(outputFilename, grid);
     }
 
     /**
@@ -65,11 +75,38 @@ public class Sudoku {
      * @return
      */
     public Cell[][] readPuzzle(String filename) {
-        System.out.println("TODO: Read sudoku puzzle solution from " + filename + ".sdku");
-        // TODO: Account for possible invalid input file and handle an error.
-        // TODO: Spaces in the file should be represented as '.' in the grid.
+
+        File f = new File("spring24/week9/" + filename + ".sdku");
+        if(f == null || !f.exists() || f.isDirectory() || !f.canRead()) {
+            System.out.println("The file " + filename + ".sdku does not exist or cannot be read.");
+            System.out.println("The exact path to the file is: " + f.getAbsolutePath());
+            return null;
+        }
+
+        // TODO: Periods '.' in the file should be represented with '0' in the grid.
         // TOOD: Read the file's puzzle.
-        return null;
+
+        try (Scanner in = new Scanner(f)) {
+            Cell[][] grid = new Cell[9][9];
+            for(int i = 0; i < 9; i++) {
+                String line = in.nextLine();
+                for(int j = 0; j < 9; j++) {
+                    if(line.charAt(j) == '.') {
+                        grid[i][j] = new Cell(i, j, 0);
+                        continue;
+                    }
+                    
+                    int value = Character.getNumericValue(line.charAt(j));
+                    grid[i][j] = new Cell(i, j, value);
+                }
+            }
+
+            return grid;
+        } catch (FileNotFoundException e) {
+            System.err.println("An error occurred while reading the file " + filename + ".sdku.");
+            e.printStackTrace();
+            return null;
+        }
     }
     
     /**
@@ -86,6 +123,7 @@ public class Sudoku {
 
      /**
      * Determine what numbers are available to be placed in the given cell of the grid.
+     * This is effectively an intersection of the numbers available in the row, column, and box of the cell.
      * 
      * @param grid
      * @param row
@@ -93,11 +131,71 @@ public class Sudoku {
      * @return an array of numbers that are available to be placed in the given cell
      */
     private void getAvailableNumbers(Cell[][] grid, int row, int col) {
-        // TODO: Account for possible invalid inputs and handle an error.
-        // TODO: Given the rules of Sudoku, determine what numbers are available to be placed in the given cell of the grid.
-        // HINT: Use the getRowRemainingNumbers, getColRemainingNumbers, and getBoxRemainingNumbers methods and save to the Cell.
-        System.out.println("TODO: Get available numbers for cell at row " + row + " and column " + col);
+        int[] rowRemainingNumbers = arrayListToArray(getRowRemainingNumbers(grid, row));
+            int rowSize = rowRemainingNumbers.length;
+        int[] colRemainingNumbers = arrayListToArray(getColRemainingNumbers(grid, col));
+            int colSize = colRemainingNumbers.length;
+        int[] boxRemainingNumbers = arrayListToArray(getBoxRemainingNumbers(grid, row, col));
+            int boxSize = boxRemainingNumbers.length;
+
+        if(boxSize == 0 || rowSize == 0 || colSize == 0) {
+            System.out.println("\n\n        No available numbers for cell at row " + row + " and column " + col);
+            return;
+        } else if(boxSize == 1 && rowSize == 1 && colSize == 1) {
+            System.out.println("\n\n        Only one available number for cell at row " + row + " and column " + col);
+            grid[row][col].setValue(boxRemainingNumbers[0]);
+            return;
+        } else {
+            System.out.println("Multiple available numbers for cell at row " + row + " and column " + col);
+            // Join the arrays and find the intersection of the three arrays.
+            ArrayList<Integer> availableNumbers = new ArrayList<Integer>();
+            for(int i = 0; i < rowSize; i++) {
+                for(int j = 0; j < colSize; j++) {
+                    for(int k = 0; k < boxSize; k++) {
+                        if(rowRemainingNumbers[i] == colRemainingNumbers[j] && colRemainingNumbers[j] == boxRemainingNumbers[k]) {
+                            availableNumbers.add(rowRemainingNumbers[i]);
+                        }
+                    }
+                }
+            }
+
+            grid[row][col].setPossibleValues(arrayListToArray(availableNumbers));
+        }
     }   
+
+    /**
+     * Update the possible values for cells in the same row, column, and box as the given cell.
+     * This should always be called once a cell's value has been set, to remove that value from the possible values of other cells.
+     * 
+     * @param grid
+     * @param row
+     * @param col
+     */
+    private void updatePossibleValues(Cell[][] grid, int row, int col) {
+        int value = grid[row][col].getValue();
+        if(value == 0) {
+            return;
+        }
+
+        for(int i = 0; i < 9; i++) {
+            if(grid[row][i].getValue() == 0) {
+                grid[row][i].removePossibleValue(value);
+            }
+            if(grid[i][col].getValue() == 0) {
+                grid[i][col].removePossibleValue(value);
+            }
+        }
+
+        int boxRow = row % 3;
+        int boxCol = col % 3;
+        for(int i = 0; i < 3; i++) {
+            for(int j = 0; j < 3; j++) {
+                if(grid[boxRow * 3 + i][boxCol * 3 + j].getValue() == 0) {
+                    grid[boxRow * 3 + i][boxCol * 3 + j].removePossibleValue(value);
+                }
+            }
+        }
+    }
 
     /**
      * Solve the Sudoku puzzle.
@@ -111,7 +209,13 @@ public class Sudoku {
         // HINT: Use the getAvailableNumbers method to find the available numbers for each cell.
         // HINT: Use the isValidSolution method to check if the puzzle is solved.
         // HINT: Assume the puzzle is solvable and has only one solution.
-        System.out.println("TODO: Solve the Sudoku puzzle");
+        for(int i = 0; i < 9; i++) {
+            for(int j = 0; j < 9; j++) {
+                if(grid[i][j].getValue() == 0) {
+                    getAvailableNumbers(grid, i, j);
+                }
+            }
+        }
     }
 
     /**

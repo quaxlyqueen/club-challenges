@@ -117,6 +117,29 @@ public class Cell {
     }
 
     /**
+     * Set the list of possible values for the cell.
+     * 
+     * @param possibleValues
+     */
+    public void setPossibleValues(int[] possibleValues) {
+        this.possibleValues = new List(possibleValues);
+    }
+
+    /**
+     * Remove a value from the list of possible values.
+     * 
+     * @return
+     */
+    public void removePossibleValue(int value) {
+        if(possibleValues.contains(value)) {
+            System.out.println("Value " + value + " is not possible for that cell.");
+            return;
+        }
+        
+        possibleValues.remove(value);
+    }
+    
+    /**
      * Get a list of possible values for the cell.
      * 
      * This list is a copy of the cell's possible values, and is sorted in ascending order.
@@ -223,6 +246,36 @@ public class Cell {
             }
         }
         
+        /**
+         * Remove a value from the list.
+         * 
+         * @param value
+         */
+        public void remove(int value) {
+            if(size == 0) {
+                System.out.println("List is empty.");
+                return;
+            }
+
+            if(head.value == value) {
+                head = head.next;
+                size--;
+                return;
+            }
+
+            Value current = head;
+            while(current.next != null) {
+                if(current.next.value == value) {
+                    current.setNext(current.next.next);
+                    size--;
+                    return;
+                }
+                current = current.next;
+            }
+
+            System.out.println("Value " + value + " is not in the list.");
+        }
+
         /**
          * Get the list of values as an array.
          * 
