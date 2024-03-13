@@ -141,9 +141,16 @@ public class Sudoku {
         if(boxSize == 0 || rowSize == 0 || colSize == 0) {
             System.out.println("\n\n        No available numbers for cell at row " + row + " and column " + col);
             return;
-        } else if(boxSize == 1 && rowSize == 1 && colSize == 1) {
+        } else if(boxSize == 1 || rowSize == 1 || colSize == 1) {
             System.out.println("\n\n        Only one available number for cell at row " + row + " and column " + col);
-            grid[row][col].setValue(boxRemainingNumbers[0]);
+            
+            int value;
+            if(boxSize == 1) value = boxRemainingNumbers[0];
+            else if(rowSize == 1) value = rowRemainingNumbers[0];
+            else value = colRemainingNumbers[0];
+
+            grid[row][col].setValue(value);
+            updatePossibleValues(grid, row, col);
             return;
         } else {
             System.out.println("Multiple available numbers for cell at row " + row + " and column " + col);
