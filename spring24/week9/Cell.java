@@ -70,11 +70,6 @@ public class Cell {
      * @param value
      */
     public void setValue(int value) {
-        if(value < 1 || value > 9) {
-            System.out.println("Value " + value + " is not a valid value for this cell.");
-            return;
-        }
-        
         possibleValues.clear();
         this.value = value;
     }
@@ -106,10 +101,8 @@ public class Cell {
      */
     public void addPossibleValue(int value) {
         if(possibleValues.contains(value)) {
-            System.out.println("Value " + value + " is already possible for this cell.");
             return;
-        } else if(value < -1 || value > 9) {
-            System.out.println("Value " + value + " is not a valid value for this cell.");
+        } else if(value < 1 || value > 9) {
             return;
         }
         
@@ -131,8 +124,7 @@ public class Cell {
      * @return
      */
     public void removePossibleValue(int value) {
-        if(possibleValues.contains(value)) {
-            System.out.println("Value " + value + " is not possible for that cell.");
+        if(!possibleValues.contains(value)) {
             return;
         }
         
@@ -154,8 +146,8 @@ public class Cell {
      * Given the cell's row and column, set the box number for the cell.
      */
     private void setBox() {
-        int boxRow = row % 3;
-        int boxCol = col % 3;
+        int boxRow = row / 3;
+        int boxCol = col / 3;
         box = boxRow * 3 + boxCol;
     }
     

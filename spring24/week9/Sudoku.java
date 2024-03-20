@@ -48,15 +48,15 @@ public class Sudoku {
     public static void main(String[] args) {
         System.out.println("Welcome to the Sudoku Solver!");
 
-        Scanner in = new Scanner(System.in);
-            System.out.print("Enter the name of the input file (do not include the file extension): ");
-            String inputFilename = in.nextLine();
-            System.out.print("Enter the name of the output file (do not include the file extension): ");
-            String outputFilename = in.nextLine();
-        in.close();
+        //Scanner in = new Scanner(System.in);
+            //System.out.print("Enter the name of the input file (do not include the file extension): ");
+            //String inputFilename = in.nextLine();
+            //System.out.print("Enter the name of the output file (do not include the file extension): ");
+            //String outputFilename = in.nextLine();
+        //in.close();
 
         Sudoku app = new Sudoku();
-            Cell[][] grid = app.readPuzzle(inputFilename);
+            Cell[][] grid = app.readPuzzle("input");
             app.solve(grid);
             System.out.println("The solution to the Sudoku puzzle is:");
             for(int i = 0; i < 9; i++) {
@@ -82,9 +82,6 @@ public class Sudoku {
             System.out.println("The exact path to the file is: " + f.getAbsolutePath());
             return null;
         }
-
-        // TODO: Periods '.' in the file should be represented with '0' in the grid.
-        // TOOD: Read the file's puzzle.
 
         try (Scanner in = new Scanner(f)) {
             Cell[][] grid = new Cell[9][9];
@@ -121,6 +118,24 @@ public class Sudoku {
         // TODO: Write the solution to the file.
     }
 
+    /**
+     * Given two arrays of numbers, return the intersection of the two arrays.
+     * 
+     * @param a
+     * @param b
+     * @return
+     */
+    private ArrayList<Integer> intersection(ArrayList<Integer> a, ArrayList<Integer> b) {
+        ArrayList<Integer> intersection = new ArrayList<Integer>();
+        for(int i = 0; i < a.size(); i++) {
+            if(b.contains(a.get(i))) {
+                intersection.add(a.get(i));
+            }
+        }
+
+        return intersection;
+    }
+
      /**
      * Determine what numbers are available to be placed in the given cell of the grid.
      * This is effectively an intersection of the numbers available in the row, column, and box of the cell.
@@ -131,39 +146,22 @@ public class Sudoku {
      * @return an array of numbers that are available to be placed in the given cell
      */
     private void getAvailableNumbers(Cell[][] grid, int row, int col) {
-        int[] rowRemainingNumbers = arrayListToArray(getRowRemainingNumbers(grid, row));
-            int rowSize = rowRemainingNumbers.length;
-        int[] colRemainingNumbers = arrayListToArray(getColRemainingNumbers(grid, col));
-            int colSize = colRemainingNumbers.length;
-        int[] boxRemainingNumbers = arrayListToArray(getBoxRemainingNumbers(grid, row, col));
-            int boxSize = boxRemainingNumbers.length;
+        ArrayList<Integer> intersection = intersection(getRowRemainingNumbers(grid, row), getColRemainingNumbers(grid, col));
+        intersection = intersection(intersection, getBoxRemainingNumbers(grid, row, col));
 
-        if(boxSize == 0 || rowSize == 0 || colSize == 0) {
-            System.out.println("\n\n        No available numbers for cell at row " + row + " and column " + col);
+        if(intersection.size() == 0) {
             return;
-        } else if(boxSize == 1 || rowSize == 1 || colSize == 1) {
-            System.out.println("\n\n        Only one available number for cell at row " + row + " and column " + col);
-            
-            int value;
-            if(boxSize == 1) value = boxRemainingNumbers[0];
-            else if(rowSize == 1) value = rowRemainingNumbers[0];
-            else value = colRemainingNumbers[0];
+        } else if(intersection.size() == 1) {
+            int value = intersection.get(0);
 
             grid[row][col].setValue(value);
             updatePossibleValues(grid, row, col);
             return;
         } else {
-            System.out.println("Multiple available numbers for cell at row " + row + " and column " + col);
             // Join the arrays and find the intersection of the three arrays.
             ArrayList<Integer> availableNumbers = new ArrayList<Integer>();
-            for(int i = 0; i < rowSize; i++) {
-                for(int j = 0; j < colSize; j++) {
-                    for(int k = 0; k < boxSize; k++) {
-                        if(rowRemainingNumbers[i] == colRemainingNumbers[j] && colRemainingNumbers[j] == boxRemainingNumbers[k]) {
-                            availableNumbers.add(rowRemainingNumbers[i]);
-                        }
-                    }
-                }
+            for(int i = 0; i < intersection.size(); i++) {
+                availableNumbers.add(intersection.get(i));
             }
 
             grid[row][col].setPossibleValues(arrayListToArray(availableNumbers));
@@ -180,21 +178,26 @@ public class Sudoku {
      */
     private void updatePossibleValues(Cell[][] grid, int row, int col) {
         int value = grid[row][col].getValue();
-        if(value == 0) {
-            return;
-        }
 
         for(int i = 0; i < 9; i++) {
             if(grid[row][i].getValue() == 0) {
                 grid[row][i].removePossibleValue(value);
+                if(grid[row][i].getPossibleValues().length == 1) {
+                    grid[row][i].setValue(grid[row][i].getPossibleValues()[0]);
+                    updatePossibleValues(grid, row, i);
+                }
             }
             if(grid[i][col].getValue() == 0) {
                 grid[i][col].removePossibleValue(value);
+                if(grid[i][col].getPossibleValues().length == 1) {
+                    grid[i][col].setValue(grid[i][col].getPossibleValues()[0]);
+                    updatePossibleValues(grid, i, col);
+                }
             }
         }
 
-        int boxRow = row % 3;
-        int boxCol = col % 3;
+        int boxRow = row / 3;
+        int boxCol = col / 3;
         for(int i = 0; i < 3; i++) {
             for(int j = 0; j < 3; j++) {
                 if(grid[boxRow * 3 + i][boxCol * 3 + j].getValue() == 0) {
@@ -210,20 +213,19 @@ public class Sudoku {
      * @param grid
      */
     public void solve(Cell[][] grid) {
-        // TODO: Account for possible invalid inputs and handle an error.
-        // TODO: Given the rules of Sudoku, solve the puzzle.
-
-        // HINT: Use the getAvailableNumbers method to find the available numbers for each cell.
-        // HINT: Use the isValidSolution method to check if the puzzle is solved.
-        // HINT: Assume the puzzle is solvable and has only one solution.
-        for(int i = 0; i < 9; i++) {
-            for(int j = 0; j < 9; j++) {
-                if(grid[i][j].getValue() == 0) {
-                    getAvailableNumbers(grid, i, j);
+        // Continue until a valid solution is reached.
+        while(!isValidSolution(grid)) {
+            for(int i = 0; i < 9; i++) {
+                for(int j = 0; j < 9; j++) {
+                    if(grid[i][j].getValue() == 0) {
+                        getAvailableNumbers(grid, i, j);
+                    }
                 }
             }
         }
     }
+
+    // 
 
     /**
      * Get any number between 1 and 9 that is not in the row.
@@ -286,8 +288,8 @@ public class Sudoku {
      */
     private ArrayList<Integer> getBoxRemainingNumbers(Cell[][] grid, int row, int col) {
         ArrayList<Integer> remainingNumbers = new ArrayList<Integer>();
-        int boxRow = row % 3;
-        int boxCol = col % 3;
+        int boxRow = row / 3;
+        int boxCol = col / 3;
         for(int i = 1; i <= 9; i++) {
             boolean found = false;
             for(int j = 0; j < 3; j++) {
