@@ -337,7 +337,7 @@ public class Sudoku {
         for(int i = 0; i < 9; i++) {
             for(int j = 0; j < 9; j++) {
                 if(grid[i][j].getValue() < 1 || grid[i][j].getValue() > 9) {
-                    System.out.println("Cell at row " + i + " and column " + j + " has an invalid value.");
+                    //System.out.println("Cell at row " + i + " and column " + j + " has an invalid value of " + grid[i][j].getValue() + ".");
                     return false;
                 }
             }
