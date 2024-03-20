@@ -48,15 +48,15 @@ public class Sudoku {
     public static void main(String[] args) {
         System.out.println("Welcome to the Sudoku Solver!");
 
-        //Scanner in = new Scanner(System.in);
-            //System.out.print("Enter the name of the input file (do not include the file extension): ");
-            //String inputFilename = in.nextLine();
+        Scanner in = new Scanner(System.in);
+            System.out.print("Enter the name of the input file (do not include the file extension): ");
+            String inputFilename = in.nextLine();
             //System.out.print("Enter the name of the output file (do not include the file extension): ");
             //String outputFilename = in.nextLine();
-        //in.close();
+        in.close();
 
         Sudoku app = new Sudoku();
-            Cell[][] grid = app.readPuzzle("input");
+            Cell[][] grid = app.readPuzzle(inputFilename);
             app.solve(grid);
             System.out.println("The solution to the Sudoku puzzle is:");
             for(int i = 0; i < 9; i++) {
